@@ -10,6 +10,7 @@ public class BubbleSort implements SortingAlgorithm {
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
 	MemorySlice memory = new MemorySlice(input);
+
 	for (int max = memory.getSize(); max > 0; max--) {
 	    Element c = memory.remove(0);
 	    for (int i = 0; i < max - 1; i++) {

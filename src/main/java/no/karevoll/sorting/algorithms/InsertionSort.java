@@ -11,7 +11,7 @@ public class InsertionSort implements SortingAlgorithm {
     public void sort(MemoryArray input, MemoryManager memoryManager) {
 	MemorySlice memory = new MemorySlice(input);
 
-	for (int i = 1; i < memory.getSize() - 1; i++) {
+	for (int i = 1; i < memory.getSize(); i++) {
 	    Element c = memory.remove(i);
 	    boolean done = false;
 	    for (int j = i - 1; j >= 0 && !done; j--) {

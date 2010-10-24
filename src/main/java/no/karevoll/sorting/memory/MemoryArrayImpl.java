@@ -203,4 +203,11 @@ public class MemoryArrayImpl implements MemoryArray {
 	element.setState(oldState);
     }
 
+    public boolean isSorted() {
+	boolean r = true;
+	for (int i = 1; r && i < elements.length; i++) {
+	    r &= elements[i - 1].compareTo(elements[i]) <= 0;
+	}
+	return r;
+    }
 }
