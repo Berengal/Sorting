@@ -54,7 +54,7 @@ public class SuperParallellMergeSort implements SortingAlgorithm {
 		ex.printStackTrace();
 	    }
 	}
-	memoryManager.free(scratchMemory);
+	// memoryManager.free(scratchMemory);
 	new MemorySlice(input).markSorted();
     }
 
@@ -202,7 +202,7 @@ public class SuperParallellMergeSort implements SortingAlgorithm {
 
 	private int binarySearch(MemorySlice array, Element find) {
 	    int start = 0, end = array.getSize();
-	    while (end - start > 1) {
+	    while (end - start > 2) {
 		int middle = ((end - start) / 2) + start;
 		int cmp = array.read(middle).compareTo(find);
 		switch (cmp) {
@@ -212,18 +212,14 @@ public class SuperParallellMergeSort implements SortingAlgorithm {
 		    start = middle + 1;
 		    break;
 		case 1:
-		    end = middle;
+		    end = middle + 1;
 		    break;
 		}
 	    }
-	    if (start < array.getSize() - 1
-		    && array.read(start).compareTo(find) == -1) {
-		return start + 1;
-	    } else if (start >= array.getSize()) {
-		return array.getSize() - 1;
-	    } else {
-		return start;
+	    while (start < array.getSize() && array.compare(start, find) < 0) {
+		start++;
 	    }
+	    return start;
 	}
 
     }
