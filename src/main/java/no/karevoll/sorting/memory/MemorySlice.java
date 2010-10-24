@@ -7,13 +7,34 @@ public class MemorySlice implements MemoryArray {
     private int end;
 
     public MemorySlice(MemoryArray input) {
-	this(input, 0, input.getSize());
+	this.memory = input;
+	this.start = 0;
+	this.end = input.getSize();
     }
 
     public MemorySlice(MemoryArray input, int start, int end) {
+	if (start < 0)
+	    throw new IndexOutOfBoundsException();
+	if (end > input.getSize())
+	    throw new IndexOutOfBoundsException();
+	if (start > end)
+	    throw new IllegalArgumentException();
+
 	this.memory = input;
 	this.start = start;
 	this.end = end;
+    }
+
+    public MemorySlice sliceLeft(int index) {
+	if (index == getSize())
+	    return this;
+	return new MemorySlice(memory, start, convert(index));
+    }
+
+    public MemorySlice sliceRight(int index) {
+	if (index == 0)
+	    return this;
+	return new MemorySlice(memory, convertEx(index), end);
     }
 
     @Override
@@ -31,6 +52,16 @@ public class MemorySlice implements MemoryArray {
 	return index + start;
     }
 
+    private int convertEx(int index) {
+	if (index < 0) {
+	    throw new ArrayIndexOutOfBoundsException(index);
+	}
+	if (index > getSize()) {
+	    throw new ArrayIndexOutOfBoundsException(index);
+	}
+	return index + start;
+    }
+
     @Override
     public void insert(Element element, int index) {
 	memory.insert(element, convert(index));
@@ -43,12 +74,15 @@ public class MemorySlice implements MemoryArray {
 
     @Override
     public Element remove(int index) {
-	return memory.remove(convert(index));
+	Element e = memory.read(convert(index));
+	memory.markRemoved(index);
+	return e;
     }
 
     @Override
     public void swap(int i, int j) {
-	memory.swap(convert(i), convert(j));
+	if (i != j)
+	    memory.swap(convert(i), convert(j));
     }
 
     @Override
@@ -81,4 +115,13 @@ public class MemorySlice implements MemoryArray {
 	}
     }
 
+    public void markSorted(int index) {
+	memory.read(convert(index)).markSorted();
+    }
+
+    public void markSorted() {
+	for (int i = start; i < end; i++) {
+	    memory.read(i).markSorted();
+	}
+    }
 }

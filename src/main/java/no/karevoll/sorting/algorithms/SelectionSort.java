@@ -4,21 +4,23 @@ import no.karevoll.sorting.SortingAlgorithm;
 import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
 import no.karevoll.sorting.memory.MemoryManager;
+import no.karevoll.sorting.memory.MemorySlice;
 
 public class SelectionSort implements SortingAlgorithm {
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
-	for (int i = 0; i < input.getSize(); i++) {
+	MemorySlice memory = new MemorySlice(input);
+	for (int i = 0; i < memory.getSize(); i++) {
 	    int min = i;
-	    Element minE = input.read(i);
-	    for (int j = i + 1; j < input.getSize(); j++) {
-		if (minE.compareTo(input.read(j)) >= 0) {
+	    Element minE = memory.read(i);
+	    for (int j = i + 1; j < memory.getSize(); j++) {
+		if (minE.compareTo(memory.read(j)) >= 0) {
 		    min = j;
-		    minE = input.read(min);
+		    minE = memory.read(min);
 		}
 	    }
-	    if (min != i)
-		input.swap(i, min);
+
+	    memory.swap(i, min);
 	    minE.markSorted();
 	}
     }
