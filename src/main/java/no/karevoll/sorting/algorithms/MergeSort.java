@@ -6,8 +6,8 @@
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
-import no.karevoll.sorting.memory.IMemoryManager;
 import no.karevoll.sorting.memory.MemoryArray;
+import no.karevoll.sorting.memory.MemoryManager;
 
 /**
  * 
@@ -15,11 +15,11 @@ import no.karevoll.sorting.memory.MemoryArray;
  */
 public class MergeSort implements SortingAlgorithm {
     @Override
-    public void sort(MemoryArray input, IMemoryManager memoryManager) {
+    public void sort(MemoryArray input, MemoryManager memoryManager) {
 	sort(input, memoryManager, 0, input.getSize());
     }
 
-    private void sort(MemoryArray input, IMemoryManager manager,
+    private void sort(MemoryArray input, MemoryManager manager,
 	    final int start, final int end) {
 	if (start >= end - 1)
 	    return;

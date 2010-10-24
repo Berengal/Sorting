@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 import no.karevoll.sorting.App;
 import no.karevoll.sorting.SortingAlgorithm;
-import no.karevoll.sorting.memory.IMemoryManager;
 import no.karevoll.sorting.memory.MemoryArray;
+import no.karevoll.sorting.memory.MemoryManager;
 
 public class ParallellMergeSort implements SortingAlgorithm {
 
@@ -17,7 +17,7 @@ public class ParallellMergeSort implements SortingAlgorithm {
     Object done;
 
     @Override
-    public void sort(MemoryArray input, IMemoryManager memoryManager) {
+    public void sort(MemoryArray input, MemoryManager memoryManager) {
 	this.input = input;
 	scratchMemory = memoryManager.allocate(input.getSize(),
 		"Scratch memory");

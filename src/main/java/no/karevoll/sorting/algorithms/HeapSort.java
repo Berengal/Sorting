@@ -6,8 +6,8 @@
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
-import no.karevoll.sorting.memory.IMemoryManager;
 import no.karevoll.sorting.memory.MemoryArray;
+import no.karevoll.sorting.memory.MemoryManager;
 
 /**
  * 
@@ -15,7 +15,7 @@ import no.karevoll.sorting.memory.MemoryArray;
  */
 public class HeapSort implements SortingAlgorithm {
     @Override
-    public void sort(MemoryArray input, IMemoryManager memoryManager) {
+    public void sort(MemoryArray input, MemoryManager memoryManager) {
 	for (int i = input.getSize() / 2; i >= 0; i--) {
 	    downheap(input, input.getSize(), i);
 	}

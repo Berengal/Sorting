@@ -1,21 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
-import no.karevoll.sorting.memory.IMemoryManager;
 import no.karevoll.sorting.memory.MemoryArray;
+import no.karevoll.sorting.memory.MemoryManager;
 
-/**
- * 
- * @author berengal
- */
 public class ShakerSort implements SortingAlgorithm {
     @Override
-    public void sort(MemoryArray input, IMemoryManager memoryManager) {
+    public void sort(MemoryArray input, MemoryManager memoryManager) {
 	int min = 0, max = input.getSize();
 	boolean done = false;
 	while (min < max && !done) {

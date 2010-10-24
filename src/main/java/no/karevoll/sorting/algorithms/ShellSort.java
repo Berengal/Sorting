@@ -1,12 +1,12 @@
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
-import no.karevoll.sorting.memory.IMemoryManager;
 import no.karevoll.sorting.memory.MemoryArray;
+import no.karevoll.sorting.memory.MemoryManager;
 
 public class ShellSort implements SortingAlgorithm {
     @Override
-    public void sort(MemoryArray input, IMemoryManager memoryManager) {
+    public void sort(MemoryArray input, MemoryManager memoryManager) {
 	int inc = input.getSize() / 2;
 	while (inc > 0) {
 	    for (int i = inc; i < input.getSize(); i++) {

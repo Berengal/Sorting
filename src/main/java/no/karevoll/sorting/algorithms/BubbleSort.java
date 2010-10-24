@@ -1,28 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
-import no.karevoll.sorting.memory.IMemoryManager;
 import no.karevoll.sorting.memory.MemoryArray;
+import no.karevoll.sorting.memory.MemoryManager;
+import no.karevoll.sorting.memory.MemorySlice;
 
-/**
- * 
- * @author berengal
- */
 public class BubbleSort implements SortingAlgorithm {
     @Override
-    public void sort(MemoryArray input, IMemoryManager memoryManager) {
-	for (int max = input.getSize(); max > 0; max--) {
+    public void sort(MemoryArray input, MemoryManager memoryManager) {
+	MemorySlice memory = new MemorySlice(input);
+	for (int max = memory.getSize(); max > 0; max--) {
 	    for (int i = 0; i < max - 1; i++) {
-		if (input.read(i).compareTo(input.read(i + 1)) > 0) {
-		    input.swap(i + 1, i);
-		}
+		memory.compareAndSwap(i, i + 1);
 	    }
-	    input.read(max - 1).markSorted();
+	    memory.read(max - 1).markSorted();
 	}
     }
 }

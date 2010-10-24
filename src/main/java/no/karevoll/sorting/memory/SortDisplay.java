@@ -14,17 +14,17 @@ import no.karevoll.sorting.SortingEvent;
 public class SortDisplay extends Component {
     private static final long serialVersionUID = 2775060975992246909L;
 
-    public static SortDisplay getInstance(MemoryArray memory) {
+    public static SortDisplay getInstance(MemoryArrayImpl memory) {
 	return new SortDisplay(memory);
     }
 
-    private final MemoryArray memory;
+    private final MemoryArrayImpl memory;
     private final Queue<SortingEvent.Event> eventQueue = new ConcurrentLinkedQueue<SortingEvent.Event>();
     {
 	setBackground(Color.black);
     }
 
-    private SortDisplay(MemoryArray memory) {
+    private SortDisplay(MemoryArrayImpl memory) {
 	this.memory = memory;
 	setPreferredSize(new Dimension(memory.getSize(), memory.getMaxValue()));
     }
