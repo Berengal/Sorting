@@ -1,65 +1,74 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
+import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
 import no.karevoll.sorting.memory.MemoryManager;
+import no.karevoll.sorting.memory.MemorySlice;
 
-/**
- * 
- * @author berengal
- */
 public class MergeSort implements SortingAlgorithm {
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
-	sort(input, memoryManager, 0, input.getSize());
+	MemorySlice memory = new MemorySlice(input);
+	sort(memory, memoryManager, true);
     }
 
-    private void sort(MemoryArray input, MemoryManager manager,
-	    final int start, final int end) {
-	if (start >= end - 1)
+    private void sort(MemorySlice memory, MemoryManager manager, boolean last) {
+	if (memory.getSize() <= 1)
 	    return;
+	if (memory.getSize() == 2)
+	    memory.compareAndSwap(0, 1);
 
-	int p = (start + end) / 2;
-	sort(input, manager, start, p);
-	sort(input, manager, p, end);
+	int p = memory.getSize() / 2;
+	MemorySlice left = memory.sliceLeft(p);
+	MemorySlice right = memory.sliceRight(p);
+	sort(left, manager, false);
+	sort(right, manager, false);
 
-	MemoryArray A = manager.allocate(p - start, "A");
-	MemoryArray B = manager.allocate(end - p, "B");
-
-	for (int i = 0; i < A.getSize(); i++) {
-	    A.insert(input.remove(start + i), i);
-	}
-	for (int i = 0; i < B.getSize(); i++) {
-	    B.insert(input.remove(p + i), i);
-	}
+	MemoryArray scratch = manager.allocate(memory.getSize(), "Scratch");
 
 	int i = 0, j = 0;
 
-	while (i < A.getSize() && j < B.getSize()) {
-	    if (A.read(i).compareTo(B.read(j)) < 0) {
-		input.insert(A.remove(i), start + i + j);
-		i++;
+	boolean done = false;
+	Element leftElement = left.remove(0);
+	Element rightElement = right.remove(0);
+	while (!done) {
+	    if (leftElement.compareTo(rightElement) < 0) {
+		scratch.insert(leftElement, i++ + j);
+		if (i < left.getSize()) {
+		    leftElement = left.remove(i);
+		} else {
+		    scratch.insert(rightElement, i + j++);
+		    done = true;
+		}
 	    } else {
-		input.insert(B.remove(j), start + i + j);
-		j++;
+		scratch.insert(rightElement, i + j++);
+		if (j < right.getSize()) {
+		    rightElement = right.remove(j);
+		} else {
+		    scratch.insert(leftElement, i++ + j);
+		    done = true;
+		}
 	    }
 	}
 
-	while (i < A.getSize()) {
-	    input.insert(A.remove(i), start + i + j);
+	while (i < left.getSize()) {
+	    scratch.insert(left.remove(i), i + j);
 	    i++;
 	}
-	while (j < B.getSize()) {
-	    input.insert(B.remove(j), start + i + j);
+
+	while (j < right.getSize()) {
+	    scratch.insert(right.remove(j), i + j);
 	    j++;
 	}
 
-	manager.free(A);
-	manager.free(B);
+	for (i = 0; i < scratch.getSize(); i++) {
+	    Element e = scratch.remove(i);
+	    if (last)
+		e.markSorted();
+	    memory.insert(e, i);
+	}
+
+	manager.free(scratch);
     }
 }

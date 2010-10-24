@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package no.karevoll.sorting.memory;
 
 import java.util.ArrayList;
@@ -10,11 +5,12 @@ import java.util.List;
 
 import no.karevoll.sorting.App;
 
-/**
- * 
- * @author berengal
- */
 public class MemoryManagerImpl implements MemoryManager {
+
+    private int reads = 0;
+    private int removes = 0;
+    private int writes = 0;
+    private int swaps = 0;
 
     public static MemoryManagerImpl newInstance(int maxValue) {
 	return new MemoryManagerImpl(maxValue);
@@ -44,6 +40,11 @@ public class MemoryManagerImpl implements MemoryManager {
     public double getTime() {
 	int r = 0;
 
+	r += reads * App.READ_TIME;
+	r += writes * App.WRITE_TIME;
+	r += removes * App.REMOVE_TIME;
+	r += swaps * App.SWAP_TIME;
+
 	for (MemoryArrayImpl a : memory) {
 	    r += a.getReads() * App.READ_TIME;
 	    r += a.getWrites() * App.WRITE_TIME;
@@ -55,7 +56,16 @@ public class MemoryManagerImpl implements MemoryManager {
     }
 
     public void free(MemoryArray memoryArray) {
-	memory.remove(memoryArray);
+	if (!memory.contains(memoryArray))
+	    throw new IllegalArgumentException();
+	MemoryArrayImpl array = (MemoryArrayImpl) memoryArray;
+
+	reads += array.getReads();
+	writes += array.getWrites();
+	removes += array.getRemoves();
+	swaps += array.getSwaps();
+
+	memory.remove(array);
     }
 
 }

@@ -1,18 +1,34 @@
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
+import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
 import no.karevoll.sorting.memory.MemoryManager;
+import no.karevoll.sorting.memory.MemorySlice;
 
 public class ShellSort implements SortingAlgorithm {
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
-	int inc = input.getSize() / 2;
+	MemorySlice memory = new MemorySlice(input);
+	int inc = memory.getSize() / 2;
 	while (inc > 0) {
-	    for (int i = inc; i < input.getSize(); i++) {
-		for (int j = i; j >= inc
-			&& input.read(j).compareTo(input.read(j - inc)) < 0; j -= inc) {
-		    input.swap(j, j - inc);
+	    for (int i = inc; i < memory.getSize(); i++) {
+		// for (int j = i; j >= inc && memory.compareAndSwap(j - inc,
+		// j); j -= inc);
+		Element c = memory.remove(i);
+		boolean done = false;
+		for (int j = i - inc; j >= 0 && !done; j -= inc) {
+		    Element n = memory.read(j);
+		    if (c.compareTo(n) < 0) {
+			memory.insert(n, j + inc);
+			memory.markRemoved(j);
+		    } else {
+			memory.insert(c, j + inc);
+			done = true;
+		    }
+		}
+		if (!done) {
+		    memory.insert(c, i % inc);
 		}
 	    }
 	    if (inc > 2)
@@ -21,5 +37,6 @@ public class ShellSort implements SortingAlgorithm {
 		inc--;
 	}
 
+	memory.markSorted();
     }
 }
