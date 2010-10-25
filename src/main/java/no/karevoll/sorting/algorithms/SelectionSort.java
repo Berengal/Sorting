@@ -20,7 +20,10 @@ public class SelectionSort implements SortingAlgorithm {
 		}
 	    }
 
-	    memory.swap(i, min);
+	    if (i != min) {
+		memory.set(memory.remove(i), min);
+		memory.insert(minE, i);
+	    }
 	    minE.markSorted();
 	}
     }

@@ -1,39 +1,61 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package no.karevoll.sorting.algorithms;
 
 import no.karevoll.sorting.SortingAlgorithm;
 import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
 import no.karevoll.sorting.memory.MemoryManager;
+import no.karevoll.sorting.memory.MemorySlice;
 
-/**
- * 
- * @author berengal
- */
 public class QuickSort implements SortingAlgorithm {
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
-	sort(input, 0, input.getSize());
+	sort(new MemorySlice(input));
     }
 
-    private void sort(MemoryArray input, final int start, final int end) {
-	if (start >= end)
+    private void sort(MemorySlice memory) {
+	switch (memory.getSize()) {
+	case 0:
 	    return;
-	Element pivot = input.remove(start);
+	case 1:
+	    memory.markSorted(0);
+	    return;
+	case 2:
+	    Element a = memory.read(0);
+	    Element b = memory.read(1);
 
-	int spot = start;
+	    if (a.compareTo(b) > 0) {
+		memory.set(a, 1);
+		memory.set(b, 0);
+	    }
+	    a.markSorted();
+	    b.markSorted();
+	    return;
+	default:
+	}
+
+	int spot = partision(memory, 0);
+
+	sort(memory.sliceLeft(spot));
+	sort(memory.sliceRight(spot + 1));
+    }
+
+    public static int partision(MemorySlice memory, int pivotIndex) {
+	Element pivot = memory.remove(pivotIndex);
+	if (pivotIndex != 0) {
+	    memory.insert(memory.remove(0), pivotIndex);
+	}
+
+	int spot = 0;
 	int direction = -1;
 
-	int min = start + 1;
-	int max = end - 1;
+	int min = 0;
+	int max = memory.getSize() - 1;
 	int index = max;
 	while (index != spot) {
-	    if (input.read(index).compareTo(pivot) == direction) {
-		input.insert(input.remove(index), spot);
+	    Element c = memory.read(index);
+	    if (c.compareTo(pivot) == direction) {
+		memory.markRemoved(index);
+		memory.insert(c, spot);
 		spot = index;
 		if (direction == -1) {
 		    max = index - 1;
@@ -47,10 +69,10 @@ public class QuickSort implements SortingAlgorithm {
 		index += direction;
 	    }
 	}
-	input.insert(pivot, spot);
-	pivot.markSorted();
-	sort(input, start, spot);
-	sort(input, spot + 1, end);
-    }
 
+	memory.insert(pivot, spot);
+	pivot.markSorted();
+
+	return spot;
+    }
 }

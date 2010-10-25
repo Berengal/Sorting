@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package no.karevoll.sorting.algorithms;
 
 import java.util.concurrent.BlockingQueue;
@@ -16,11 +11,8 @@ import no.karevoll.sorting.SortingAlgorithm;
 import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
 import no.karevoll.sorting.memory.MemoryManager;
+import no.karevoll.sorting.memory.MemorySlice;
 
-/**
- * 
- * @author berengal
- */
 public class ParallellQuickSort implements SortingAlgorithm {
 
     private ExecutorService executor;
@@ -31,73 +23,52 @@ public class ParallellQuickSort implements SortingAlgorithm {
 	Counter c = new Counter(input.getSize());
 	executor = new ThreadPoolExecutor(App.THREAD_POOL_SIZE,
 		App.THREAD_POOL_SIZE, 1, TimeUnit.SECONDS, queue);
-	sort(input, 0, input.getSize(), c);
+	sort(new MemorySlice(input), c);
 	c.waitZero();
     }
 
-    private void sort(final MemoryArray input, final int start, final int end,
-	    final Counter c) {
-	switch (end - start) {
+    private void sort(final MemorySlice memory, final Counter c) {
+	switch (memory.getSize()) {
 	case 0:
 	    return;
 	case 1:
-	    input.read(start).markSorted();
+	    memory.markSorted(0);
 	    c.dec();
 	    return;
 	case 2:
-	    if (input.read(start).compareTo(input.read(start + 1)) > 0) {
-		input.swap(start, start + 1);
+	    Element a = memory.read(0);
+	    Element b = memory.read(1);
+
+	    if (a.compareTo(b) > 0) {
+		memory.set(a, 1);
+		memory.set(b, 0);
 	    }
-	    input.read(start).markSorted();
+	    a.markSorted();
 	    c.dec();
-	    input.read(start + 1).markSorted();
+	    b.markSorted();
 	    c.dec();
 	    return;
 	default:
 	}
 
-	Element pivot = input.remove(start);
+	int spot = QuickSort.partision(memory, 0);
 
-	int spot = start;
-	int direction = -1;
-
-	int min = start + 1;
-	int max = end - 1;
-	int index = max;
-	while (index != spot) {
-	    if (input.read(index).compareTo(pivot) == direction) {
-		input.insert(input.remove(index), spot);
-		spot = index;
-		if (direction == -1) {
-		    max = index - 1;
-		    index = min;
-		} else {
-		    min = index + 1;
-		    index = max;
-		}
-		direction *= -1;
-	    } else {
-		index += direction;
-	    }
-	}
-	input.insert(pivot, spot);
-	pivot.markSorted();
 	c.dec();
 	final int firstSpot = spot;
-	if (end - start > 0) {
+	if (memory.getSize() > 0) {
 	    executor.execute(new Runnable() {
 		public void run() {
-		    sort(input, start, firstSpot, c);
+		    sort(memory.sliceLeft(firstSpot), c);
 		}
 	    });
 	    executor.execute(new Runnable() {
 		public void run() {
-		    sort(input, firstSpot + 1, end, c);
+		    sort(memory.sliceRight(firstSpot + 1), c);
 		}
 	    });
 	} else {
-	    sort(input, start, firstSpot, c);
-	    sort(input, firstSpot + 1, end, c);
+	    sort(memory.sliceLeft(firstSpot), c);
+	    sort(memory.sliceRight(firstSpot + 1), c);
 	}
     }
 
@@ -113,7 +84,6 @@ public class ParallellQuickSort implements SortingAlgorithm {
 		try {
 		    wait();
 		} catch (InterruptedException e) {
-		    // TODO Auto-generated catch block
 		    e.printStackTrace();
 		}
 	    }

@@ -72,6 +72,12 @@ public class MemorySlice implements MemoryArray {
 	memory.insert(element, convert(index));
     }
 
+    public void set(Element element, int index) {
+	int i = convert(index);
+	memory.markRemoved(i);
+	memory.insert(element, i);
+    }
+
     @Override
     public Element remove(int index) {
 	int i = convert(index);
@@ -83,7 +89,13 @@ public class MemorySlice implements MemoryArray {
     @Override
     public void swap(int i, int j) {
 	if (i != j) {
-	    memory.swap(convert(i), convert(j));
+	    int p = convert(i);
+	    int q = convert(j);
+
+	    Element a = memory.read(p);
+	    Element b = memory.read(q);
+	    set(a, j);
+	    set(b, i);
 	}
     }
 

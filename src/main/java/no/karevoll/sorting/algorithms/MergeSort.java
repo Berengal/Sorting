@@ -63,7 +63,8 @@ public class MergeSort implements SortingAlgorithm {
 	}
 
 	for (i = 0; i < scratch.getSize(); i++) {
-	    Element e = scratch.remove(i);
+	    Element e = scratch.read(i);
+	    scratch.markRemoved(i);
 	    if (last)
 		e.markSorted();
 	    memory.insert(e, i);
