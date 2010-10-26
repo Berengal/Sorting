@@ -21,10 +21,10 @@ import no.karevoll.sorting.parallell.Counter;
  * 
  * @author berengal
  */
-public class SuperParallellMergeSort implements SortingAlgorithm {
+public class MERGETRON2000 implements SortingAlgorithm {
 
   private final int parallellCutoff;
-  public SuperParallellMergeSort(int parallellCutoff) {
+  public MERGETRON2000(int parallellCutoff) {
     this.parallellCutoff = parallellCutoff;
   }
 
@@ -134,7 +134,7 @@ public class SuperParallellMergeSort implements SortingAlgorithm {
 
     @Override
     public void run() {
-      if (firstList.getSize() + secondList.getSize() < parallellCutoff) {
+      if (firstList.getSize() < parallellCutoff || secondList.getSize() < parallellCutoff) {
         serialMerge();
       } else {
         parallellMerge();
