@@ -21,10 +21,10 @@ import no.karevoll.sorting.parallell.Counter;
  * 
  * @author berengal
  */
-public class MERGETRON2000 implements SortingAlgorithm {
+public class MERGETRON implements SortingAlgorithm {
 
   private final int parallellCutoff;
-  public MERGETRON2000(int parallellCutoff) {
+  public MERGETRON(int parallellCutoff) {
     this.parallellCutoff = parallellCutoff;
   }
 
