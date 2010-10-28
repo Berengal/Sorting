@@ -6,14 +6,10 @@ public interface MemoryArray {
 
     public Element read(int index);
 
-    @Deprecated
-    public Element remove(int index);
-
     public int getSize();
 
-    @Deprecated
-    public void swap(int i, int j);
-
     public void markRemoved(int index);
+
+    public void markSorted(int index);
 
 }

@@ -6,7 +6,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import no.karevoll.sorting.App;
 import no.karevoll.sorting.SortingAlgorithm;
 import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
@@ -16,13 +15,18 @@ import no.karevoll.sorting.memory.MemorySlice;
 public class ParallellQuickSort implements SortingAlgorithm {
 
     private ExecutorService executor;
+    private int threads;
+
+    public ParallellQuickSort(int threads) {
+	this.threads = threads;
+    }
 
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
 	BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 	Counter c = new Counter(input.getSize());
-	executor = new ThreadPoolExecutor(App.THREAD_POOL_SIZE,
-		App.THREAD_POOL_SIZE, 1, TimeUnit.SECONDS, queue);
+	executor = new ThreadPoolExecutor(threads, threads, 1,
+		TimeUnit.SECONDS, queue);
 	sort(new MemorySlice(input), c);
 	c.waitZero();
     }

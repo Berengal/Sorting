@@ -13,8 +13,6 @@ public class ShellSort implements SortingAlgorithm {
 	int inc = memory.getSize() / 2;
 	while (inc > 0) {
 	    for (int i = inc; i < memory.getSize(); i++) {
-		// for (int j = i; j >= inc && memory.compareAndSwap(j - inc,
-		// j); j -= inc);
 		Element c = memory.remove(i);
 		boolean done = false;
 		for (int j = i - inc; j >= 0 && !done; j -= inc) {

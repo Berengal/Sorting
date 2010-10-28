@@ -14,8 +14,10 @@ public class MergeSort implements SortingAlgorithm {
     }
 
     private void sort(MemorySlice memory, MemoryManager manager, boolean last) {
-	if (memory.getSize() <= 1)
+	if (memory.getSize() <= 1) {
+	    memory.markSorted();
 	    return;
+	}
 	if (memory.getSize() == 2)
 	    memory.compareAndSwap(0, 1);
 

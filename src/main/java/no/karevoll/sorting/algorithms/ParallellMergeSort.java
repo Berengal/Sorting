@@ -5,7 +5,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import no.karevoll.sorting.App;
 import no.karevoll.sorting.SortingAlgorithm;
 import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
@@ -16,6 +15,11 @@ import no.karevoll.sorting.parallell.Counter;
 public class ParallellMergeSort implements SortingAlgorithm {
     Executor executor;
     Object done;
+    private int threads;
+
+    public ParallellMergeSort(int threads) {
+	this.threads = threads;
+    }
 
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
@@ -24,9 +28,8 @@ public class ParallellMergeSort implements SortingAlgorithm {
 		"Scratch memory");
 	MemorySlice scratch = new MemorySlice(scratchMemory);
 
-	executor = new ThreadPoolExecutor(App.THREAD_POOL_SIZE,
-		App.THREAD_POOL_SIZE, 0, TimeUnit.SECONDS,
-		new LinkedBlockingQueue<Runnable>());
+	executor = new ThreadPoolExecutor(threads, threads, 0,
+		TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 	done = new Object();
 	executor.execute(new Merger(memory, scratch, new Counter(1),
