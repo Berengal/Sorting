@@ -14,89 +14,92 @@ import no.karevoll.sorting.memory.MemorySlice;
 
 public class ParallellQuickSort implements SortingAlgorithm {
 
-    private ExecutorService executor;
-    private int threads;
+  private ExecutorService executor;
+  private int threads;
+  public ParallellQuickSort(int threads) {
+    this.threads = threads;
+  }
 
-    public ParallellQuickSort(int threads) {
-	this.threads = threads;
+  @Override
+  public void sort(MemoryArray input, MemoryManager memoryManager) {
+    BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+    Counter c = new Counter(input.getSize());
+    executor = new ThreadPoolExecutor(threads, threads, 1,
+            TimeUnit.SECONDS, queue);
+    sort(new MemorySlice(input), c);
+    c.waitZero();
+  }
+
+  private void sort(final MemorySlice memory, final Counter c) {
+    switch (memory.getSize()) {
+      case 0:
+        return;
+      case 1:
+        memory.markSorted(0);
+        c.dec();
+        return;
+      case 2:
+        Element a = memory.read(0);
+        Element b = memory.read(1);
+
+        if (a.compareTo(b) > 0) {
+          memory.set(a, 1);
+          memory.set(b, 0);
+        }
+        a.markSorted();
+        c.dec();
+        b.markSorted();
+        c.dec();
+        return;
+      default:
     }
 
-    @Override
-    public void sort(MemoryArray input, MemoryManager memoryManager) {
-	BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-	Counter c = new Counter(input.getSize());
-	executor = new ThreadPoolExecutor(threads, threads, 1,
-		TimeUnit.SECONDS, queue);
-	sort(new MemorySlice(input), c);
-	c.waitZero();
+    int spot = QuickSort.partition(memory, 0);
+
+    c.dec();
+    final int firstSpot = spot;
+    if (memory.getSize() > 0) {
+      executor.execute(new Runnable() {
+
+        public void run() {
+          sort(memory.sliceLeft(firstSpot), c);
+        }
+
+      });
+      executor.execute(new Runnable() {
+
+        public void run() {
+          sort(memory.sliceRight(firstSpot + 1), c);
+        }
+
+      });
+    } else {
+      sort(memory.sliceLeft(firstSpot), c);
+      sort(memory.sliceRight(firstSpot + 1), c);
+    }
+  }
+
+  class Counter {
+
+    private int n;
+    public Counter(int n) {
+      this.n = n;
     }
 
-    private void sort(final MemorySlice memory, final Counter c) {
-	switch (memory.getSize()) {
-	case 0:
-	    return;
-	case 1:
-	    memory.markSorted(0);
-	    c.dec();
-	    return;
-	case 2:
-	    Element a = memory.read(0);
-	    Element b = memory.read(1);
-
-	    if (a.compareTo(b) > 0) {
-		memory.set(a, 1);
-		memory.set(b, 0);
-	    }
-	    a.markSorted();
-	    c.dec();
-	    b.markSorted();
-	    c.dec();
-	    return;
-	default:
-	}
-
-	int spot = QuickSort.partision(memory, 0);
-
-	c.dec();
-	final int firstSpot = spot;
-	if (memory.getSize() > 0) {
-	    executor.execute(new Runnable() {
-		public void run() {
-		    sort(memory.sliceLeft(firstSpot), c);
-		}
-	    });
-	    executor.execute(new Runnable() {
-		public void run() {
-		    sort(memory.sliceRight(firstSpot + 1), c);
-		}
-	    });
-	} else {
-	    sort(memory.sliceLeft(firstSpot), c);
-	    sort(memory.sliceRight(firstSpot + 1), c);
-	}
+    synchronized void waitZero() {
+      while (n > 0) {
+        try {
+          wait();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
     }
 
-    class Counter {
-	private int n;
-
-	public Counter(int n) {
-	    this.n = n;
-	}
-
-	synchronized void waitZero() {
-	    while (n > 0) {
-		try {
-		    wait();
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
-		}
-	    }
-	}
-
-	synchronized void dec() {
-	    n--;
-	    notifyAll();
-	}
+    synchronized void dec() {
+      n--;
+      notifyAll();
     }
 
+  }
 }

@@ -33,13 +33,13 @@ public class QuickSort implements SortingAlgorithm {
 	default:
 	}
 
-	int spot = partision(memory, 0);
+	int spot = partition(memory, 0);
 
 	sort(memory.sliceLeft(spot));
 	sort(memory.sliceRight(spot + 1));
     }
 
-    public static int partision(MemorySlice memory, int pivotIndex) {
+    public static int partition(MemorySlice memory, int pivotIndex) {
 	Element pivot = memory.remove(pivotIndex);
 	if (pivotIndex != 0) {
 	    memory.insert(memory.remove(0), pivotIndex);
