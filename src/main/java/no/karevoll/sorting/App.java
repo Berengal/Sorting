@@ -15,131 +15,127 @@ import no.karevoll.sorting.memory.MemoryManagerImpl;
 import no.karevoll.sorting.memory.SortDisplay;
 
 public class App {
-    public static void main(String[] args) throws InterruptedException {
-	Settings settings = new Settings();
 
-	// test(new StoogeSort(), settings);
-	// test(new BubbleSort(), settings);
-	// test(new ShakerSort(), settings);
-	// test(new SelectionSort(), settings);
-	// test(new DualSelectionSort(), settings);
-	// test(new InsertionSort(), settings);
-	// test(new BinaryInsertionSort(), settings);
-	// test(new ShellSort(), settings);
-	// test(new HeapSort(), settings);
-	// test(new MergeSort(), settings);
-	// test(new QuickSort(), settings);
-	// test(new Median3QuickSort(), settings);
-	//
-	// test(new ParallellMergeSort(), settings);
-	// test(new ParallellQuickSort(), settings);
-	// test(
-	// new MERGETRON(settings.THREAD_POOL_SIZE,
-	// settings.PARALLELL_CUTOFF), settings);
+  public static void main(String[] args) throws InterruptedException {
+    Settings settings = new Settings();
 
-	// drawGraf(new BubbleSort(), 10000, 1000);
-	// drawGraf(new ShakerSort(), 10000, 1000);
-	// drawGraf(new SelectionSort(), 10000, 1000);
-	// drawGraf(new DualSelectionSort(), 10000, 1000);
-	// drawGraf(new InsertionSort(), 10000, 1000);
-	// drawGraf(new BinaryInsertionSort(), 10000, 1000);
-	// drawGraf(new QuickSort(), 10000, 1000);
-	// drawGraf(new Median3QuickSort(), 10000, 1000);
-	// drawGraf(new MergeSort(), 10000, 1000);
-	// drawGraf(new ParallellQuickSort(4), 10000, 1000);
-	// drawGraf(new ParallellMergeSort(4), 10000, 1000);
+    // test(new StoogeSort(), settings);
+    // test(new BubbleSort(), settings);
+    // test(new ShakerSort(), settings);
+    // test(new SelectionSort(), settings);
+    // test(new DualSelectionSort(), settings);
+    // test(new InsertionSort(), settings);
+    // test(new BinaryInsertionSort(), settings);
+    // test(new ShellSort(), settings);
+    // test(new HeapSort(), settings);
+    // test(new MergeSort(), settings);
+    // test(new QuickSort(), settings);
+    // test(new Median3QuickSort(), settings);
+    //
+    // test(new ParallellMergeSort(), settings);
+    // test(new ParallellQuickSort(), settings);
+    // test(
+    // new MERGETRON(settings.THREAD_POOL_SIZE,
+    // settings.PARALLELL_CUTOFF), settings);
 
-	// System.exit(0);
+    // drawGraf(new BubbleSort(), 10000, 1000);
+    // drawGraf(new ShakerSort(), 10000, 1000);
+    // drawGraf(new SelectionSort(), 10000, 1000);
+    // drawGraf(new DualSelectionSort(), 10000, 1000);
+    // drawGraf(new InsertionSort(), 10000, 1000);
+    // drawGraf(new BinaryInsertionSort(), 10000, 1000);
+    // drawGraf(new QuickSort(), 10000, 1000);
+    // drawGraf(new Median3QuickSort(), 10000, 1000);
+    // drawGraf(new MergeSort(), 10000, 1000);
+    // drawGraf(new ParallellQuickSort(4), 10000, 1000);
+    // drawGraf(new ParallellMergeSort(4), 10000, 1000);
+
+    // System.exit(0);
+  }
+
+  private static void drawGraph(SortingAlgorithm algo, int max, int interval) {
+    System.out.printf("%20s: ", algo.getClass().getSimpleName());
+
+    for (int i = interval; i <= max; i += interval) {
+      Settings settings = new Settings();
+      settings.DISPLAY = false;
+      settings.LIST_SIZE = i;
+      System.out.printf("%6.3fs ", test(algo, settings) / i);
     }
 
-    private static void drawGraf(SortingAlgorithm algo, int max, int interval) {
-	System.out.printf("%20s: ", algo.getClass().getSimpleName());
+    System.out.println();
+  }
 
-	for (int i = interval; i <= max; i += interval) {
-	    Settings settings = new Settings();
-	    settings.DISPLAY = false;
-	    settings.LIST_SIZE = i;
-	    System.out.printf("%6.3fs ", test(algo, settings) / i);
-	}
+  private static double test(SortingAlgorithm algo, Settings settings) {
+    MemoryManagerImpl manager = MemoryManagerImpl.newInstance(settings);
+    MemoryArrayImpl memory = manager.allocateShuffled(algo.getClass().getSimpleName());
 
-	System.out.println();
+    JFrame frame = null;
+
+    if (settings.DISPLAY) {
+      frame = newFrame(memory, settings);
+      JOptionPane.showMessageDialog(frame, optionsString(settings) + "\n"
+              + algo.getClass().getSimpleName() + "\nStart");
+    }
+    long start = System.currentTimeMillis();
+
+    algo.sort(memory, manager);
+
+    long end = System.currentTimeMillis();
+    if (settings.DISPLAY) {
+      JOptionPane.showMessageDialog(frame, algo.getClass().getSimpleName()
+              + "\nDone\n\nReal time: "
+              + String.format("%.2fs", (end - start) / 1000.0)
+              + "\nSimulated time: "
+              + String.format("%.2fs", manager.getTime()));
+      frame.dispose();
+    } else {
+      // System.out.println(algo.getClass().getSimpleName()
+      // + "\nReal time: "
+      // + String.format("%.2fs", (end - start) / 1000.0)
+      // + "\nSimulated time: "
+      // + String.format("%.2fs", manager.getTime()) + "\n\n");
     }
 
-    private static double test(SortingAlgorithm algo, Settings settings) {
-	MemoryManagerImpl manager = MemoryManagerImpl.newInstance(settings);
-	MemoryArrayImpl memory = manager.allocateShuffled(algo.getClass()
-		.getSimpleName());
+    return manager.getTime();
+  }
 
-	JFrame frame = null;
+  private static JFrame newFrame(MemoryArrayImpl memory, Settings settings) {
+    final JFrame mainFrame = new JFrame(memory.getLabel());
+    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    final Container contents = mainFrame.getContentPane();
+    mainFrame.setLayout(new BoxLayout(contents, BoxLayout.X_AXIS));
+    final SortDisplay sortDisplay = SortDisplay.getInstance(memory,
+            settings);
+    contents.add(sortDisplay);
+    Timer timer = new Timer(50, new ActionListener() {
 
-	if (settings.DISPLAY) {
-	    frame = newFrame(memory, settings);
-	    JOptionPane.showMessageDialog(frame, optionsString(settings) + "\n"
-		    + algo.getClass().getSimpleName() + "\nStart");
-	}
-	long start = System.currentTimeMillis();
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sortDisplay.repaint();
+      }
 
-	algo.sort(memory, manager);
+    });
+    timer.start();
+    mainFrame.pack();
 
-	long end = System.currentTimeMillis();
-	if (settings.DISPLAY) {
-	    JOptionPane.showMessageDialog(frame, algo.getClass()
-		    .getSimpleName()
-		    + "\nDone\n\nReal time: "
-		    + String.format("%.2fs", (end - start) / 1000.0)
-		    + "\nSimulated time: "
-		    + String.format("%.2fs", manager.getTime()));
-	    frame.dispose();
-	} else {
-	    // System.out.println(algo.getClass().getSimpleName()
-	    // + "\nReal time: "
-	    // + String.format("%.2fs", (end - start) / 1000.0)
-	    // + "\nSimulated time: "
-	    // + String.format("%.2fs", manager.getTime()) + "\n\n");
-	}
-
-	return manager.getTime();
+    if (settings.FULLSCREEN) {
+      mainFrame.setExtendedState(mainFrame.getExtendedState()
+              | JFrame.MAXIMIZED_BOTH);
+    } else {
+      mainFrame.setMaximumSize(new Dimension(settings.FRAME_WIDTH,
+              settings.FRAME_HEIGHT));
     }
+    mainFrame.setVisible(true);
 
-    private static JFrame newFrame(MemoryArrayImpl memory, Settings settings) {
-	final JFrame mainFrame = new JFrame(memory.getLabel());
-	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	final Container contents = mainFrame.getContentPane();
-	mainFrame.setLayout(new BoxLayout(contents, BoxLayout.X_AXIS));
-	final SortDisplay sortDisplay = SortDisplay.getInstance(memory,
-		settings);
-	contents.add(sortDisplay);
-	Timer timer = new Timer(50, new ActionListener() {
+    return mainFrame;
+  }
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		sortDisplay.repaint();
-	    }
-
-	});
-	timer.start();
-	mainFrame.pack();
-
-	if (settings.FULLSCREEN) {
-	    mainFrame.setExtendedState(mainFrame.getExtendedState()
-		    | JFrame.MAXIMIZED_BOTH);
-	} else {
-	    mainFrame.setMaximumSize(new Dimension(settings.FRAME_WIDTH,
-		    settings.FRAME_HEIGHT));
-	}
-	mainFrame.setVisible(true);
-
-	return mainFrame;
-    }
-
-    private static String optionsString(Settings settings) {
-	StringBuilder sb = new StringBuilder();
-	String fs = "%15s: %d%n";
-	sb
-		.append(String.format(fs, "Elements", settings.LIST_SIZE))
-		.append(String.format(fs, "Threads", settings.THREAD_POOL_SIZE))
-		.append(String.format(fs, "Delay x", settings.DELAY_MULTIPLIER));
-	return sb.toString();
-    }
+  private static String optionsString(Settings settings) {
+    StringBuilder sb = new StringBuilder();
+    String fs = "%15s: %d%n";
+    sb.append(String.format(fs, "Elements", settings.LIST_SIZE)).append(String.format(fs, "Threads", settings.THREAD_POOL_SIZE)).append(String.format(fs, "Delay x", settings.DELAY_MULTIPLIER));
+    return sb.toString();
+  }
 
 }
