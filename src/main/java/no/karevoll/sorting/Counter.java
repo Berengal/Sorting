@@ -1,10 +1,10 @@
 package no.karevoll.sorting;
 
 public class Counter {
-    private int reads = 0;
-    private int removes = 0;
-    private int writes = 0;
-    private int compares = 0;
+    private long reads = 0;
+    private long removes = 0;
+    private long writes = 0;
+    private long compares = 0;
     private final Settings settings;
 
     public Counter(final Settings settings) {
@@ -41,7 +41,7 @@ public class Counter {
     }
 
     public double getTime() {
-	int r = 0;
+	long r = 0;
 
 	r += reads * settings.READ_TIME;
 	r += writes * settings.WRITE_TIME;

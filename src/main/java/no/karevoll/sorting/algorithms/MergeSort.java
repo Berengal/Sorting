@@ -10,12 +10,13 @@ public class MergeSort implements SortingAlgorithm {
     @Override
     public void sort(MemoryArray input, MemoryManager memoryManager) {
 	MemorySlice memory = new MemorySlice(input);
-	sort(memory, memoryManager, true);
+	sort(memory, new MemorySlice(memoryManager.allocate(memory.getSize(),
+		"Scratch")));
+	memory.markSorted();
     }
 
-    private void sort(MemorySlice memory, MemoryManager manager, boolean last) {
+    private void sort(MemorySlice memory, MemorySlice scratch) {
 	if (memory.getSize() <= 1) {
-	    memory.markSorted();
 	    return;
 	}
 	if (memory.getSize() == 2)
@@ -24,10 +25,8 @@ public class MergeSort implements SortingAlgorithm {
 	int p = memory.getSize() / 2;
 	MemorySlice left = memory.sliceLeft(p);
 	MemorySlice right = memory.sliceRight(p);
-	sort(left, manager, false);
-	sort(right, manager, false);
-
-	MemoryArray scratch = manager.allocate(memory.getSize(), "Scratch");
+	sort(left, scratch.sliceLeft(p));
+	sort(right, scratch.sliceRight(p));
 
 	int i = 0, j = 0;
 
@@ -67,11 +66,7 @@ public class MergeSort implements SortingAlgorithm {
 	for (i = 0; i < scratch.getSize(); i++) {
 	    Element e = scratch.read(i);
 	    scratch.markRemoved(i);
-	    if (last)
-		e.markSorted();
 	    memory.insert(e, i);
 	}
-
-	manager.free(scratch);
     }
 }

@@ -3,9 +3,9 @@ package no.karevoll.sorting;
 public class Settings {
     public final int DELAY_MULTIPLIER = 1;
 
-    public int READ_TIME = 1 * DELAY_MULTIPLIER;
-    public int WRITE_TIME = 2 * DELAY_MULTIPLIER;
-    public int COMPARE_TIME = 2 * DELAY_MULTIPLIER;
+    public int READ_TIME = 0 * DELAY_MULTIPLIER;
+    public int WRITE_TIME = 1 * DELAY_MULTIPLIER;
+    public int COMPARE_TIME = 5 * DELAY_MULTIPLIER;
     public int REMOVE_TIME = 0 * DELAY_MULTIPLIER;
 
     public int LIST_SIZE = 1000;
@@ -16,6 +16,6 @@ public class Settings {
 
     public int FRAME_WIDTH = 1024;
     public int FRAME_HEIGHT = 768;
-    public boolean FULLSCREEN = true;
+    public boolean FULLSCREEN = false;
     public boolean DISPLAY = true;
 }
