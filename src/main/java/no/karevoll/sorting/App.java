@@ -9,34 +9,33 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import no.karevoll.sorting.algorithms.MERGETRON;
 
 import no.karevoll.sorting.memory.MemoryArrayImpl;
 import no.karevoll.sorting.memory.MemoryManagerImpl;
-import no.karevoll.sorting.memory.SortDisplay;
 
 public class App {
 
   public static void main(String[] args) throws InterruptedException {
     Settings settings = new Settings();
 
-    // test(new StoogeSort(), settings);
-    // test(new BubbleSort(), settings);
-    // test(new ShakerSort(), settings);
-    // test(new SelectionSort(), settings);
-    // test(new DualSelectionSort(), settings);
-    // test(new InsertionSort(), settings);
-    // test(new BinaryInsertionSort(), settings);
-    // test(new ShellSort(), settings);
-    // test(new HeapSort(), settings);
-    // test(new MergeSort(), settings);
-    // test(new QuickSort(), settings);
-    // test(new Median3QuickSort(), settings);
-    //
-    // test(new ParallellMergeSort(), settings);
-    // test(new ParallellQuickSort(), settings);
-    // test(
-    // new MERGETRON(settings.THREAD_POOL_SIZE,
-    // settings.PARALLELL_CUTOFF), settings);
+//     test(new StoogeSort(), settings);
+//     test(new BubbleSort(), settings);
+//     test(new ShakerSort(), settings);
+//     test(new SelectionSort(), settings);
+//     test(new DualSelectionSort(), settings);
+//     test(new InsertionSort(), settings);
+//     test(new BinaryInsertionSort(), settings);
+//     test(new ShellSort(), settings);
+//     test(new HeapSort(), settings);
+//     test(new MergeSort(), settings);
+//     test(new FasterMergeSort(), settings);
+//     test(new QuickSort(), settings);
+//     test(new Median3QuickSort(), settings);
+//
+//     test(new ParallellMergeSort(settings.THREAD_POOL_SIZE), settings);
+//     test(new ParallellQuickSort(settings.THREAD_POOL_SIZE), settings);
+     test(new MERGETRON(settings.THREAD_POOL_SIZE, settings.PARALLELL_CUTOFF), settings);
 
     // drawGraf(new BubbleSort(), 10000, 1000);
     // drawGraf(new ShakerSort(), 10000, 1000);
@@ -50,7 +49,7 @@ public class App {
     // drawGraf(new ParallellQuickSort(4), 10000, 1000);
     // drawGraf(new ParallellMergeSort(4), 10000, 1000);
 
-    // System.exit(0);
+     System.exit(0);
   }
 
   private static void drawGraph(SortingAlgorithm algo, int max, int interval) {
@@ -67,16 +66,18 @@ public class App {
   }
 
   private static double test(SortingAlgorithm algo, Settings settings) {
-    MemoryManagerImpl manager = MemoryManagerImpl.newInstance(settings);
-    MemoryArrayImpl memory = manager.allocateShuffled(algo.getClass().getSimpleName());
 
     JFrame frame = null;
 
     if (settings.DISPLAY) {
-      frame = newFrame(memory, settings);
-      JOptionPane.showMessageDialog(frame, optionsString(settings) + "\n"
-              + algo.getClass().getSimpleName() + "\nStart");
+      frame = newFrame(settings);
     }
+
+    MemoryManagerImpl manager = MemoryManagerImpl.newInstance(frame, settings);
+    MemoryArrayImpl memory = manager.allocateShuffled(algo.getClass().getSimpleName());
+
+    JOptionPane.showMessageDialog(frame, optionsString(settings) + "\n"
+              + algo.getClass().getSimpleName() + "\nStart");
     long start = System.currentTimeMillis();
 
     algo.sort(memory, manager);
@@ -100,19 +101,16 @@ public class App {
     return manager.getTime();
   }
 
-  private static JFrame newFrame(MemoryArrayImpl memory, Settings settings) {
-    final JFrame mainFrame = new JFrame(memory.getLabel());
+  private static JFrame newFrame(Settings settings) {
+    final JFrame mainFrame = new JFrame("Sorting");
     mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     final Container contents = mainFrame.getContentPane();
-    mainFrame.setLayout(new BoxLayout(contents, BoxLayout.X_AXIS));
-    final SortDisplay sortDisplay = SortDisplay.getInstance(memory,
-            settings);
-    contents.add(sortDisplay);
+    mainFrame.setLayout(new BoxLayout(contents, BoxLayout.Y_AXIS));
     Timer timer = new Timer(50, new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        sortDisplay.repaint();
+        mainFrame.repaint();
       }
 
     });

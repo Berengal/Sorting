@@ -10,7 +10,7 @@ import no.karevoll.sorting.memory.Element;
 import no.karevoll.sorting.memory.MemoryArray;
 import no.karevoll.sorting.memory.MemoryManager;
 import no.karevoll.sorting.memory.MemorySlice;
-import no.karevoll.sorting.parallell.Counter;
+import no.karevoll.sorting.parallel.Counter;
 
 public class ParallellMergeSort implements SortingAlgorithm {
     Executor executor;
